@@ -83,7 +83,7 @@ class DiagnosticErrorListener(ErrorListener):
         if ruleName is None or len(ruleName)==0:
             return str(decision)
 
-        return str(decision) + " (" + ruleName + ")"
+        return f"{str(decision)} ({ruleName})"
 
     #
     # Computes the set of conflicting or ambiguous alternatives from a
@@ -100,8 +100,4 @@ class DiagnosticErrorListener(ErrorListener):
         if reportedAlts is not None:
             return reportedAlts
 
-        result = set()
-        for config in configs:
-            result.add(config.alt)
-
-        return result
+        return {config.alt for config in configs}

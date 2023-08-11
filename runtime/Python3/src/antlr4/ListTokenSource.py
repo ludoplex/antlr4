@@ -138,7 +138,4 @@ class ListTokenSource(TokenSource):
         if self.sourceName is not None:
             return self.sourceName
         inputStream = self.getInputStream()
-        if inputStream is not None:
-            return inputStream.getSourceName()
-        else:
-            return "List"
+        return inputStream.getSourceName() if inputStream is not None else "List"

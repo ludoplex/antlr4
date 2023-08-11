@@ -112,8 +112,7 @@ class RuleContext(RuleNode):
         return 0
 
     def getChildren(self):
-        for c in []:
-            yield c
+        yield from []
 
     def accept(self, visitor:ParseTreeVisitor):
         return visitor.visitChildren(self)

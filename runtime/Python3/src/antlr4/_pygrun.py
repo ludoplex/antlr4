@@ -83,11 +83,11 @@ def main():
     # check and load antlr generated files
     #############################################################
     # dynamic load the module and class
-    lexerName = grammar + 'Lexer'
-    parserName = grammar + 'Parser'
+    lexerName = f'{grammar}Lexer'
+    parserName = f'{grammar}Parser'
     # check if the generate file exist
-    lexer_file = lexerName + '.py'
-    parser_file = parserName + '.py'
+    lexer_file = f'{lexerName}.py'
+    parser_file = f'{parserName}.py'
     if not os.path.exists(lexer_file):
         print("[ERROR] Can't find lexer file {}!".format(lexer_file))
         print(os.path.realpath('.'))
@@ -103,7 +103,7 @@ def main():
     # print(sys.path)
 
     # add current directory to python global namespace in case of relative imports
-    globals().update({'__package__': os.path.basename(os.getcwd())})
+    globals()['__package__'] = os.path.basename(os.getcwd())
 
     # print("Load Lexer {}".format(lexerName))
     module_lexer = __import__(lexerName, globals(), locals(), lexerName)

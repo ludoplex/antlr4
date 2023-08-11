@@ -116,10 +116,7 @@ class TerminalNodeImpl(TerminalNode):
         return self.symbol.text
 
     def __str__(self):
-        if self.symbol.type == Token.EOF:
-            return "<EOF>"
-        else:
-            return self.symbol.text
+        return "<EOF>" if self.symbol.type == Token.EOF else self.symbol.text
 
 # Represents a token that was consumed during resynchronization
 #  rather than during a valid match operation. For example,

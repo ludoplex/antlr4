@@ -71,24 +71,20 @@ class XPathLexer(Lexer):
 
     def action(self, localctx:RuleContext, ruleIndex:int, actionIndex:int):
         if self._actions is None:
-            actions = dict()
-            actions[4] = self.ID_action 
+            actions = {4: self.ID_action}
             self._actions = actions
         action = self._actions.get(ruleIndex, None)
         if action is not None:
             action(localctx, actionIndex)
         else:
-            raise Exception("No registered action for:" + str(ruleIndex))
+            raise Exception(f"No registered action for:{ruleIndex}")
 
 
     def ID_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 0:
 
-                            char = self.text[0]
-                            if char.isupper():
-                                self.type = XPathLexer.TOKEN_REF
-                            else:
-                                self.type = XPathLexer.RULE_REF
+            char = self.text[0]
+            self.type = XPathLexer.TOKEN_REF if char.isupper() else XPathLexer.RULE_REF
             				
      
 

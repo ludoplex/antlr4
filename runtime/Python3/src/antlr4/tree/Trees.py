@@ -44,7 +44,7 @@ class Trees(object):
         if ruleNames is not None:
             if isinstance(t, RuleNode):
                 if t.getAltNumber()!=0: # should use ATN.INVALID_ALT_NUMBER but won't compile
-                    return ruleNames[t.getRuleIndex()]+":"+str(t.getAltNumber())
+                    return f"{ruleNames[t.getRuleIndex()]}:{str(t.getAltNumber())}"
                 return ruleNames[t.getRuleIndex()]
             elif isinstance( t, ErrorNode):
                 return str(t)
@@ -53,9 +53,7 @@ class Trees(object):
                     return t.symbol.text
         # no recog for rule names
         payload = t.getPayload()
-        if isinstance(payload, Token ):
-            return payload.text
-        return str(t.getPayload())
+        return payload.text if isinstance(payload, Token ) else str(t.getPayload())
 
 
     # Return ordered list of all children of this node
@@ -93,12 +91,16 @@ class Trees(object):
     def _findAllNodes(cls, t:ParseTree, index:int, findTokens:bool, nodes:list):
         from antlr4.ParserRuleContext import ParserRuleContext
         # check this node (the root) first
-        if findTokens and isinstance(t, TerminalNode):
-            if t.symbol.type==index:
-                nodes.append(t)
-        elif not findTokens and isinstance(t, ParserRuleContext):
-            if t.ruleIndex == index:
-                nodes.append(t)
+        if (
+            findTokens
+            and isinstance(t, TerminalNode)
+            and t.symbol.type == index
+            or (not findTokens or not isinstance(t, TerminalNode))
+            and not findTokens
+            and isinstance(t, ParserRuleContext)
+            and t.ruleIndex == index
+        ):
+            nodes.append(t)
         # check children
         for i in range(0, t.getChildCount()):
             cls._findAllNodes(t.getChild(i), index, findTokens, nodes)

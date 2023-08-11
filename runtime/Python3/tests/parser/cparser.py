@@ -991,31 +991,24 @@ class CParser ( Parser ):
                 self.enterOuterAlt(localctx, 1)
                 self.state = 168
                 self.match(CParser.Identifier)
-                pass
-
             elif la_ == 2:
                 self.enterOuterAlt(localctx, 2)
                 self.state = 169
                 self.match(CParser.Constant)
-                pass
-
             elif la_ == 3:
                 self.enterOuterAlt(localctx, 3)
                 self.state = 171
                 self._errHandler.sync(self)
                 _alt = 1
-                while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
-                    if _alt == 1:
-                        self.state = 170
-                        self.match(CParser.StringLiteral)
-
-                    else:
+                while _alt not in [2, ATN.INVALID_ALT_NUMBER]:
+                    if _alt != 1:
                         raise NoViableAltException(self)
+                    self.state = 170
+                    self.match(CParser.StringLiteral)
+
                     self.state = 173
                     self._errHandler.sync(self)
                     _alt = self._interp.adaptivePredict(self._input,0,self._ctx)
-
-                pass
 
             elif la_ == 4:
                 self.enterOuterAlt(localctx, 4)
@@ -1025,14 +1018,10 @@ class CParser ( Parser ):
                 self.expression(0)
                 self.state = 177
                 self.match(CParser.RightParen)
-                pass
-
             elif la_ == 5:
                 self.enterOuterAlt(localctx, 5)
                 self.state = 179
                 self.genericSelection()
-                pass
-
             elif la_ == 6:
                 self.enterOuterAlt(localctx, 6)
                 self.state = 181
@@ -1048,8 +1037,6 @@ class CParser ( Parser ):
                 self.compoundStatement()
                 self.state = 185
                 self.match(CParser.RightParen)
-                pass
-
             elif la_ == 7:
                 self.enterOuterAlt(localctx, 7)
                 self.state = 187
@@ -1064,8 +1051,6 @@ class CParser ( Parser ):
                 self.typeName()
                 self.state = 192
                 self.match(CParser.RightParen)
-                pass
-
             elif la_ == 8:
                 self.enterOuterAlt(localctx, 8)
                 self.state = 194
@@ -1080,9 +1065,6 @@ class CParser ( Parser ):
                 self.unaryExpression()
                 self.state = 199
                 self.match(CParser.RightParen)
-                pass
-
-
         except RecognitionException as re:
             localctx.exception = re
             self._errHandler.reportError(self, re)
@@ -1199,7 +1181,7 @@ class CParser ( Parser ):
             self.state = 218
             self._errHandler.sync(self)
             _alt = self._interp.adaptivePredict(self._input,3,self._ctx)
-            while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
+            while _alt not in [2, ATN.INVALID_ALT_NUMBER]:
                 if _alt==1:
                     if self._parseListeners is not None:
                         self.triggerExitRuleEvent()
@@ -1363,8 +1345,6 @@ class CParser ( Parser ):
             if la_ == 1:
                 self.state = 231
                 self.primaryExpression()
-                pass
-
             elif la_ == 2:
                 self.state = 232
                 self.match(CParser.LeftParen)
@@ -1378,8 +1358,6 @@ class CParser ( Parser ):
                 self.initializerList(0)
                 self.state = 237
                 self.match(CParser.RightBrace)
-                pass
-
             elif la_ == 3:
                 self.state = 239
                 self.match(CParser.LeftParen)
@@ -1395,8 +1373,6 @@ class CParser ( Parser ):
                 self.match(CParser.Comma)
                 self.state = 245
                 self.match(CParser.RightBrace)
-                pass
-
             elif la_ == 4:
                 self.state = 247
                 self.match(CParser.T__0)
@@ -1412,8 +1388,6 @@ class CParser ( Parser ):
                 self.initializerList(0)
                 self.state = 253
                 self.match(CParser.RightBrace)
-                pass
-
             elif la_ == 5:
                 self.state = 255
                 self.match(CParser.T__0)
@@ -1431,14 +1405,11 @@ class CParser ( Parser ):
                 self.match(CParser.Comma)
                 self.state = 262
                 self.match(CParser.RightBrace)
-                pass
-
-
             self._ctx.stop = self._input.LT(-1)
             self.state = 289
             self._errHandler.sync(self)
             _alt = self._interp.adaptivePredict(self._input,8,self._ctx)
-            while _alt!=2 and _alt!=ATN.INVALID_ALT_NUMBER:
+            while _alt not in [2, ATN.INVALID_ALT_NUMBER]:
                 if _alt==1:
                     if self._parseListeners is not None:
                         self.triggerExitRuleEvent()
@@ -1458,8 +1429,6 @@ class CParser ( Parser ):
                         self.expression(0)
                         self.state = 269
                         self.match(CParser.RightBracket)
-                        pass
-
                     elif la_ == 2:
                         localctx = CParser.PostfixExpressionContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_postfixExpression)
@@ -1478,8 +1447,6 @@ class CParser ( Parser ):
 
                         self.state = 276
                         self.match(CParser.RightParen)
-                        pass
-
                     elif la_ == 3:
                         localctx = CParser.PostfixExpressionContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_postfixExpression)
@@ -1491,8 +1458,6 @@ class CParser ( Parser ):
                         self.match(CParser.Dot)
                         self.state = 279
                         self.match(CParser.Identifier)
-                        pass
-
                     elif la_ == 4:
                         localctx = CParser.PostfixExpressionContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_postfixExpression)
@@ -1504,8 +1469,6 @@ class CParser ( Parser ):
                         self.match(CParser.Arrow)
                         self.state = 282
                         self.match(CParser.Identifier)
-                        pass
-
                     elif la_ == 5:
                         localctx = CParser.PostfixExpressionContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_postfixExpression)
@@ -1515,8 +1478,6 @@ class CParser ( Parser ):
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 6)")
                         self.state = 284
                         self.match(CParser.PlusPlus)
-                        pass
-
                     elif la_ == 6:
                         localctx = CParser.PostfixExpressionContext(self, _parentctx, _parentState)
                         self.pushNewRecursionContext(localctx, _startState, self.RULE_postfixExpression)
@@ -1526,9 +1487,6 @@ class CParser ( Parser ):
                             raise FailedPredicateException(self, "self.precpred(self._ctx, 5)")
                         self.state = 286
                         self.match(CParser.MinusMinus)
-                        pass
-
-
                 self.state = 291
                 self._errHandler.sync(self)
                 _alt = self._interp.adaptivePredict(self._input,8,self._ctx)

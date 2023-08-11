@@ -36,7 +36,7 @@ class ATNConfigSet(object):
     def __init__(self, fullCtx:bool=True):
         # All configs but hashed by (s, i, _, pi) not including context. Wiped out
         # when we go readonly as this set becomes a DFA state.
-        self.configLookup = dict()
+        self.configLookup = {}
         # Indicates that this configuration set is part of a full context
         #  LL prediction. It will be used to determine how to merge $. With SLL
         #  it's a wildcard whereas it is not for LL context merge.
@@ -114,10 +114,14 @@ class ATNConfigSet(object):
         return config
 
     def getStates(self):
-        return set(c.state for c in self.configs)
+        return {c.state for c in self.configs}
 
     def getPredicates(self):
-        return list(cfg.semanticContext for cfg in self.configs if cfg.semanticContext!=SemanticContext.NONE)
+        return [
+            cfg.semanticContext
+            for cfg in self.configs
+            if cfg.semanticContext != SemanticContext.NONE
+        ]
 
     def get(self, i:int):
         return self.configs[i]
@@ -141,15 +145,15 @@ class ATNConfigSet(object):
         elif not isinstance(other, ATNConfigSet):
             return False
 
-        same = self.configs is not None and \
-            self.configs==other.configs and \
-            self.fullCtx == other.fullCtx and \
-            self.uniqueAlt == other.uniqueAlt and \
-            self.conflictingAlts == other.conflictingAlts and \
-            self.hasSemanticContext == other.hasSemanticContext and \
-            self.dipsIntoOuterContext == other.dipsIntoOuterContext
-
-        return same
+        return (
+            self.configs is not None
+            and self.configs == other.configs
+            and self.fullCtx == other.fullCtx
+            and self.uniqueAlt == other.uniqueAlt
+            and self.conflictingAlts == other.conflictingAlts
+            and self.hasSemanticContext == other.hasSemanticContext
+            and self.dipsIntoOuterContext == other.dipsIntoOuterContext
+        )
 
     def __hash__(self):
         if self.readonly:

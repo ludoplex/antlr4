@@ -36,12 +36,12 @@ class TokenTagToken(CommonToken):
     #
     def getText(self):
         if self.label is None:
-            return "<" + self.tokenName + ">"
+            return f"<{self.tokenName}>"
         else:
-            return "<" + self.label + ":" + self.tokenName + ">"
+            return f"<{self.label}:{self.tokenName}>"
 
     # <p>The implementation for {@link TokenTagToken} returns a string of the form
     # {@code tokenName:type}.</p>
     #
     def __str__(self):
-        return self.tokenName + ":" + str(self.type)
+        return f"{self.tokenName}:{str(self.type)}"

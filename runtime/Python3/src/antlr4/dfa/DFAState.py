@@ -18,7 +18,7 @@ class PredPrediction(object):
         self.pred = pred
 
     def __str__(self):
-        return "(" + str(self.pred) + ", " + str(self.alt) +  ")"
+        return f"({str(self.pred)}, {str(self.alt)})"
 
 # A DFA state represents a set of possible ATN configurations.
 #  As Aho, Sethi, Ullman p. 117 says "The DFA uses its state
@@ -86,7 +86,7 @@ class DFAState(object):
     #  DFA state.
     def getAltSet(self):
         if self.configs is not None:
-            return set(cfg.alt for cfg in self.configs) or None
+            return {cfg.alt for cfg in self.configs} or None
         return None
 
     def __hash__(self):

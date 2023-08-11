@@ -64,7 +64,7 @@ class ParseTreePattern(object):
     #
     def findAll(self, tree:ParseTree, xpath:str):
         subtrees = XPath.findAll(tree, xpath, self.matcher.parser)
-        matches = list()
+        matches = []
         for t in subtrees:
             match = self.match(t)
             if match.succeeded():

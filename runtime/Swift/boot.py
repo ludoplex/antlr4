@@ -12,6 +12,7 @@ USER_M2 constant below.
 the java version is used according to environment variable $JAVA_HOME.
 """
 
+
 from __future__ import print_function
 
 import glob
@@ -36,8 +37,8 @@ TMP_FOLDER = "/tmp/"
 DIR = os.path.dirname(os.path.realpath(__file__))
 
 # The following two are using glob syntax.
-ANTLR4_FOLDER = USER_M2 + "/repository/org/antlr/antlr4/*-SNAPSHOT"
-ANTLR4 = ANTLR4_FOLDER + "/antlr4-*-SNAPSHOT-complete.jar"
+ANTLR4_FOLDER = f"{USER_M2}/repository/org/antlr/antlr4/*-SNAPSHOT"
+ANTLR4 = f"{ANTLR4_FOLDER}/antlr4-*-SNAPSHOT-complete.jar"
 
 # Colors
 RED = "\033[91;1m"
@@ -53,7 +54,7 @@ def find_a4_jar():
     Finds the antlr4 jar.
     """
     matches = glob.glob(ANTLR4)
-    if len(matches) == 0:
+    if not matches:
         return None
     sorted(matches, reverse=True)
     return matches[0]
@@ -66,11 +67,11 @@ def find_g4():
     this python file.
     """
     file_path = os.path.realpath(__file__)
-    parent_folder = file_path[0:file_path.rindex("/") + 1]
+    parent_folder = file_path[:file_path.rindex("/") + 1]
     res = []
     for cur, _, filenames in os.walk(parent_folder):
         cur_files = fnmatch.filter(filenames, "*.g4")
-        res += [cur + "/" + cur_file for cur_file in cur_files]
+        res += [f"{cur}/{cur_file}" for cur_file in cur_files]
     return res
 
 
@@ -81,16 +82,25 @@ def gen_parser(grammar, a4):
     :param a4: antlr4 runtime
     :return: None
     """
-    grammar_folder = grammar[0:grammar.rindex("/") + 1]
+    grammar_folder = grammar[:grammar.rindex("/") + 1]
     java_home = os.environ["JAVA_HOME"]
-    java = java_home + "/bin/java"
+    java = f"{java_home}/bin/java"
     if not os.path.exists(java):
         antlr_complains("Cannot find java. Check your JAVA_HOME setting.")
         return
 
-    check_call([java, "-jar", a4,
-               "-Dlanguage=Swift", grammar, "-visitor",
-               "-o", grammar_folder + "/gen"])
+    check_call(
+        [
+            java,
+            "-jar",
+            a4,
+            "-Dlanguage=Swift",
+            grammar,
+            "-visitor",
+            "-o",
+            f"{grammar_folder}/gen",
+        ]
+    )
 
 
 def swift_test():
@@ -136,13 +146,13 @@ def generate_spm_module(in_folder=TMP_FOLDER):
     :return: None
     """
 
-    tmp_antlr_folder = in_folder + "Antlr4-tmp-" + str(int(time.time()))
+    tmp_antlr_folder = f"{in_folder}Antlr4-tmp-{int(time.time())}"
     os.mkdir(tmp_antlr_folder)
 
     # Copy folders and SPM manifest file.
     dirs_to_copy = ["Sources", "Tests"]
     for dir_to_copy in dirs_to_copy:
-        shutil.copytree(DIR + "/" + dir_to_copy, tmp_antlr_folder + "/" + dir_to_copy)
+        shutil.copytree(f"{DIR}/{dir_to_copy}", f"{tmp_antlr_folder}/{dir_to_copy}")
 
     shutil.copy("Package.swift", tmp_antlr_folder)
 
@@ -150,14 +160,15 @@ def generate_spm_module(in_folder=TMP_FOLDER):
     check_call(["git", "init"])
     check_call(["git", "add", "*"])
     check_call(["git", "commit", "-m", "Initial commit."])
-    check_call(["git", "tag", "{}.0.0".format(MAJOR_VERSION)])
+    check_call(["git", "tag", f"{MAJOR_VERSION}.0.0"])
 
     antlr_says("Created local repository.")
-    antlr_says("(swift-tools-version:3.0) " 
-               "Put .Package(url: \"{}\", majorVersion: {}) in Package.swift.".format(os.getcwd(), MAJOR_VERSION))
-    antlr_says("(swift-tools-wersion:4.0) "
-               "Put .package(url: \"{}\", from: \"{}.0.0\") in Package.swift "
-               "and add \"Antlr4\" to target dependencies. ".format(os.getcwd(), MAJOR_VERSION))
+    antlr_says(
+        f'(swift-tools-version:3.0) Put .Package(url: \"{os.getcwd()}\", majorVersion: {MAJOR_VERSION}) in Package.swift.'
+    )
+    antlr_says(
+        f'(swift-tools-wersion:4.0) Put .package(url: \"{os.getcwd()}\", from: \"{MAJOR_VERSION}.0.0\") in Package.swift and add \"Antlr4\" to target dependencies. '
+    )
 
 
 def generate_xcodeproj():
@@ -182,11 +193,11 @@ def generate_parser():
 
 
 def antlr_says(msg):
-    print(GREEN + "[ANTLR] " + msg + RESET)
+    print(f"{GREEN}[ANTLR] {msg}{RESET}")
 
 
 def antlr_complains(msg):
-    print(RED + "[ANTLR] " + msg + RESET)
+    print(f"{RED}[ANTLR] {msg}{RESET}")
 
 
 if __name__ == "__main__":

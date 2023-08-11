@@ -32,8 +32,7 @@ class TokenStreamRewriter(object):
         return self.tokens
 
     def rollback(self, instruction_index, program_name):
-        ins = self.programs.get(program_name, None)
-        if ins:
+        if ins := self.programs.get(program_name, None):
             self.programs[program_name] = ins[self.MIN_TOKEN_INDEX: instruction_index]
 
     def deleteProgram(self, program_name=DEFAULT_PROGRAM_NAME):
@@ -75,7 +74,8 @@ class TokenStreamRewriter(object):
     def replace(self, program_name, from_idx, to_idx, text):
         if any((from_idx > to_idx, from_idx < 0, to_idx < 0, to_idx >= len(self.tokens.tokens))):
             raise ValueError(
-                'replace: range invalid: {}..{}(size={})'.format(from_idx, to_idx, len(self.tokens.tokens)))
+                f'replace: range invalid: {from_idx}..{to_idx}(size={len(self.tokens.tokens)})'
+            )
         op = self.ReplaceOp(from_idx, to_idx, self.tokens, text)
         rewrites = self.getProgram(program_name)
         op.instructionIndex = len(rewrites)
@@ -112,11 +112,8 @@ class TokenStreamRewriter(object):
         rewrites = self.programs.get(program_name)
 
         # ensure start/end are in range
-        if stop > len(self.tokens.tokens) - 1:
-            stop = len(self.tokens.tokens) - 1
-        if start < 0:
-            start = 0
-
+        stop = min(stop, len(self.tokens.tokens) - 1)
+        start = max(start, 0)
         # if no instructions to execute
         if not rewrites: return self.tokens.getText(start, stop)
         buf = StringIO()
@@ -147,7 +144,7 @@ class TokenStreamRewriter(object):
             for iop in inserts:
                 if iop.index == rop.index:
                     rewrites[iop.instructionIndex] = None
-                    rop.text = '{}{}'.format(iop.text, rop.text)
+                    rop.text = f'{iop.text}{rop.text}'
                 elif all((iop.index > rop.index, iop.index <= rop.last_index)):
                     rewrites[iop.instructionIndex] = None
 
@@ -162,9 +159,11 @@ class TokenStreamRewriter(object):
                     rewrites[prevRop.instructionIndex] = None
                     rop.index = min(prevRop.index, rop.index)
                     rop.last_index = min(prevRop.last_index, rop.last_index)
-                    print('New rop {}'.format(rop))
+                    print(f'New rop {rop}')
                 elif (not(isDisjoint)):
-                    raise ValueError("replace op boundaries of {} overlap with previous {}".format(rop, prevRop))
+                    raise ValueError(
+                        f"replace op boundaries of {rop} overlap with previous {prevRop}"
+                    )
 
         # Walk inserts
         for i, iop in enumerate(rewrites):
@@ -186,7 +185,7 @@ class TokenStreamRewriter(object):
                     rewrites[i] = None
                     continue
                 if all((iop.index >= rop.index, iop.index <= rop.last_index)):
-                    raise ValueError("insert op {} within boundaries of previous {}".format(iop, rop))
+                    raise ValueError(f"insert op {iop} within boundaries of previous {rop}")
 
         reduced = {}
         for i, op in enumerate(rewrites):
@@ -221,7 +220,7 @@ class TokenStreamRewriter(object):
             return self.index
 
         def __str__(self):
-            return '<{}@{}:"{}">'.format(self.__class__.__name__, self.tokens.get(self.index), self.text)
+            return f'<{self.__class__.__name__}@{self.tokens.get(self.index)}:"{self.text}">'
 
     class InsertBeforeOp(RewriteOperation):
 
@@ -251,5 +250,4 @@ class TokenStreamRewriter(object):
 
         def __str__(self):
             if self.text:
-                return '<ReplaceOp@{}..{}:"{}">'.format(self.tokens.get(self.index), self.tokens.get(self.last_index),
-                                                        self.text)
+                return f'<ReplaceOp@{self.tokens.get(self.index)}..{self.tokens.get(self.last_index)}:"{self.text}">'

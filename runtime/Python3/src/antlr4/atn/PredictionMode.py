@@ -429,9 +429,7 @@ class PredictionMode(Enum):
     @classmethod
     def getUniqueAlt(cls, altsets:list):
         all = cls.getAlts(altsets)
-        if len(all)==1:
-            return next(iter(all))
-        return ATN.INVALID_ALT_NUMBER
+        return next(iter(all)) if len(all)==1 else ATN.INVALID_ALT_NUMBER
 
     # Gets the complete set of represented alternatives for a collection of
     # alternative subsets. This method returns the union of each {@link BitSet}
@@ -455,7 +453,7 @@ class PredictionMode(Enum):
     #
     @classmethod
     def getConflictingAltSubsets(cls, configs:ATNConfigSet):
-        configToAlts = dict()
+        configToAlts = {}
         for c in configs:
             h = hash((c.state.stateNumber, c.context))
             alts = configToAlts.get(h, None)
@@ -475,7 +473,7 @@ class PredictionMode(Enum):
     #
     @classmethod
     def getStateToAltMap(cls, configs:ATNConfigSet):
-        m = dict()
+        m = {}
         for c in configs:
             alts = m.get(c.state, None)
             if alts is None:
