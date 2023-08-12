@@ -47,7 +47,9 @@ class ATNDeserializer (object):
     def checkVersion(self):
         version = self.readInt()
         if version != SERIALIZED_VERSION:
-            raise Exception("Could not deserialize ATN with version " + str(version) + " (expected " + str(SERIALIZED_VERSION) + ").")
+            raise Exception(
+                f"Could not deserialize ATN with version {str(version)} (expected {str(SERIALIZED_VERSION)})."
+            )
 
     def readATN(self):
         idx = self.readInt()
@@ -59,7 +61,7 @@ class ATNDeserializer (object):
         loopBackStateNumbers = []
         endStateNumbers = []
         nstates = self.readInt()
-        for i in range(0, nstates):
+        for _ in range(0, nstates):
             stype = self.readInt()
             # ignore bad type of states
             if stype==ATNState.INVALID_TYPE:
@@ -84,12 +86,12 @@ class ATNDeserializer (object):
             pair[0].endState = atn.states[pair[1]]
 
         numNonGreedyStates = self.readInt()
-        for i in range(0, numNonGreedyStates):
+        for _ in range(0, numNonGreedyStates):
             stateNumber = self.readInt()
             atn.states[stateNumber].nonGreedy = True
 
         numPrecedenceStates = self.readInt()
-        for i in range(0, numPrecedenceStates):
+        for _ in range(0, numPrecedenceStates):
             stateNumber = self.readInt()
             atn.states[stateNumber].isPrecedenceRule = True
 
@@ -116,27 +118,27 @@ class ATNDeserializer (object):
 
     def readModes(self, atn:ATN):
         nmodes = self.readInt()
-        for i in range(0, nmodes):
+        for _ in range(0, nmodes):
             s = self.readInt()
             atn.modeToStartState.append(atn.states[s])
 
     def readSets(self, atn:ATN, sets:list):
         m = self.readInt()
-        for i in range(0, m):
+        for _ in range(0, m):
             iset = IntervalSet()
             sets.append(iset)
             n = self.readInt()
             containsEof = self.readInt()
             if containsEof!=0:
                 iset.addOne(-1)
-            for j in range(0, n):
+            for _ in range(0, n):
                 i1 = self.readInt()
                 i2 = self.readInt()
                 iset.addRange(range(i1, i2 + 1)) # range upper limit is exclusive
 
     def readEdges(self, atn:ATN, sets:list):
         nedges = self.readInt()
-        for i in range(0, nedges):
+        for _ in range(0, nedges):
             src = self.readInt()
             trg = self.readInt()
             ttype = self.readInt()
@@ -170,13 +172,12 @@ class ATNDeserializer (object):
                     raise Exception("IllegalState")
                 state.endState.startState = state
 
-            if isinstance(state, PlusLoopbackState):
-                for i in range(0, len(state.transitions)):
+            for i in range(0, len(state.transitions)):
+                if isinstance(state, PlusLoopbackState):
                     target = state.transitions[i].target
                     if isinstance(target, PlusBlockStartState):
                         target.loopBackState = state
-            elif isinstance(state, StarLoopbackState):
-                for i in range(0, len(state.transitions)):
+                elif isinstance(state, StarLoopbackState):
                     target = state.transitions[i].target
                     if isinstance(target, StarLoopEntryState):
                         target.loopBackState = state
@@ -389,11 +390,10 @@ class ATNDeserializer (object):
                       ]
 
     def edgeFactory(self, atn:ATN, type:int, src:int, trg:int, arg1:int, arg2:int, arg3:int, sets:list):
-        target = atn.states[trg]
         if type > len(self.edgeFactories) or self.edgeFactories[type] is None:
-            raise Exception("The specified transition type: " + str(type) + " is not valid.")
-        else:
-            return self.edgeFactories[type](atn, src, trg, arg1, arg2, arg3, sets, target)
+            raise Exception(f"The specified transition type: {type} is not valid.")
+        target = atn.states[trg]
+        return self.edgeFactories[type](atn, src, trg, arg1, arg2, arg3, sets, target)
 
     stateFactories = [  lambda : None,
                         lambda : BasicState(),
@@ -412,11 +412,10 @@ class ATNDeserializer (object):
 
     def stateFactory(self, type:int, ruleIndex:int):
         if type> len(self.stateFactories) or self.stateFactories[type] is None:
-            raise Exception("The specified state type " + str(type) + " is not valid.")
-        else:
-            s = self.stateFactories[type]()
-            if s is not None:
-                s.ruleIndex = ruleIndex
+            raise Exception(f"The specified state type {type} is not valid.")
+        s = self.stateFactories[type]()
+        if s is not None:
+            s.ruleIndex = ruleIndex
         return s
 
     CHANNEL = 0     #The type of a {@link LexerChannelAction} action.
@@ -441,6 +440,6 @@ class ATNDeserializer (object):
     def lexerActionFactory(self, type:int, data1:int, data2:int):
 
         if type > len(self.actionFactories) or self.actionFactories[type] is None:
-            raise Exception("The specified lexer action type " + str(type) + " is not valid.")
+            raise Exception(f"The specified lexer action type {type} is not valid.")
         else:
             return self.actionFactories[type](data1, data2)

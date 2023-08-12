@@ -27,7 +27,7 @@ class RuleTagToken(Token):
     # or empty.
 
     def __init__(self, ruleName:str, bypassTokenType:int, label:str=None):
-        if ruleName is None or len(ruleName)==0:
+        if ruleName is None or not ruleName:
             raise Exception("ruleName cannot be null or empty.")
         self.source = None
         self.type = bypassTokenType # token type of the token
@@ -45,6 +45,6 @@ class RuleTagToken(Token):
 
     def getText(self):
         if self.label is None:
-            return "<" + self.ruleName + ">"
+            return f"<{self.ruleName}>"
         else:
-            return "<" + self.label + ":" + self.ruleName + ">"
+            return f"<{self.label}:{self.ruleName}>"

@@ -51,9 +51,7 @@ class InputStream (object):
         if offset<0:
             offset += 1 # e.g., translate LA(-1) to use offset=0
         pos = self._index + offset - 1
-        if pos < 0 or pos >= self._size: # invalid
-            return Token.EOF
-        return self.data[pos]
+        return Token.EOF if pos < 0 or pos >= self._size else self.data[pos]
 
     def LT(self, offset: int):
         return self.LA(offset)
@@ -78,10 +76,7 @@ class InputStream (object):
     def getText(self, start :int, stop: int):
         if stop >= self._size:
             stop = self._size-1
-        if start >= self._size:
-            return ""
-        else:
-            return self.strdata[start:stop+1]
+        return "" if start >= self._size else self.strdata[start:stop+1]
 
     def __str__(self):
         return self.strdata

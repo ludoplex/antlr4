@@ -80,10 +80,10 @@ class XPathTest(unittest.TestCase):
             # Build test string
             res = XPath.findAll(self.tree, path, self.parser)
             res_str = ", ".join([tokenToString(token, self.parser.ruleNames) for token in res])
-            res_str = "[%s]" % res_str
+            res_str = f"[{res_str}]"
 
             # Test against expected output
-            self.assertEqual(res_str, expected, "Failed test %s" % path)
+            self.assertEqual(res_str, expected, f"Failed test {path}")
 
 if __name__ == '__main__':
     unittest.main()

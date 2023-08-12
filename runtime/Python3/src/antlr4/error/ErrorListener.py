@@ -43,7 +43,7 @@ class ConsoleErrorListener(ErrorListener):
     # </pre>
     #
     def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
-        print("line " + str(line) + ":" + str(column) + " " + msg, file=sys.stderr)
+        print(f"line {str(line)}:{str(column)} {msg}", file=sys.stderr)
 
 ConsoleErrorListener.INSTANCE = ConsoleErrorListener()
 

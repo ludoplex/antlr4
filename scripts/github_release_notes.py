@@ -24,8 +24,12 @@ print()
 print("## Issues fixed")
 for x in issues:
     labels = [l.name for l in x.labels]
-    if x.pull_request is None and not ("type:improvement" in labels or "type:feature" in labels):
-        print("* [%s](%s) (%s)" % (x.title, x.html_url, ", ".join([l.name for l in x.labels])))
+    if (
+        x.pull_request is None
+        and "type:improvement" not in labels
+        and "type:feature" not in labels
+    ):
+        print(f'* [{x.title}]({x.html_url}) ({", ".join([l.name for l in x.labels])})')
 
 # dump improvements closed for this release (issues or pulls)
 print()
@@ -33,7 +37,7 @@ print("## Improvements, features")
 for x in issues:
     labels = [l.name for l in x.labels]
     if ("type:improvement" in labels or "type:feature" in labels):
-        print("* [%s](%s) (%s)" % (x.title, x.html_url, ", ".join(labels)))
+        print(f'* [{x.title}]({x.html_url}) ({", ".join(labels)})')
 
 # dump PRs closed for this release by target
 print()
@@ -44,7 +48,7 @@ for target in TARGETS:
     for x in issues:
         labels = [l.name for l in x.labels]
         if x.pull_request is not None and f"target:{target}" in labels:
-            print("* [%s](%s) (%s)" % (x.title, x.html_url, ", ".join(labels)))
+            print(f'* [{x.title}]({x.html_url}) ({", ".join(labels)})')
 
 # dump contributors
 print()

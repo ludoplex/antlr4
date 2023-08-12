@@ -92,7 +92,7 @@ class LexerNoViableAltException(RecognitionException):
         if self.startIndex >= 0 and self.startIndex < self.input.size:
             symbol = self.input.getText(self.startIndex, self.startIndex)
             # TODO symbol = Utils.escapeWhitespace(symbol, false);
-        return "LexerNoViableAltException('" + symbol + "')"
+        return f"LexerNoViableAltException('{symbol}')"
 
 # Indicates that the parser could not decide which of two or more paths
 #  to take based upon the remaining input. It tracks the starting token
@@ -154,10 +154,7 @@ class FailedPredicateException(RecognitionException):
         self.offendingToken = recognizer.getCurrentToken()
 
     def formatMessage(self, predicate:str, message:str):
-        if message is not None:
-            return message
-        else:
-            return "failed predicate: {" + predicate + "}?"
+        return "failed predicate: {" + predicate + "}?" if message is None else message
 
 class ParseCancellationException(CancellationException):
 

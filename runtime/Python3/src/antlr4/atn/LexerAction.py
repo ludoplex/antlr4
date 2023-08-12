@@ -80,7 +80,7 @@ class LexerTypeAction(LexerAction):
             return self.type == other.type
 
     def __str__(self):
-        return "type(" + str(self.type) + ")"
+        return f"type({str(self.type)})"
 
 
 # Implements the {@code pushMode} lexer action by calling
@@ -109,7 +109,7 @@ class LexerPushModeAction(LexerAction):
             return self.mode == other.mode
 
     def __str__(self):
-        return "pushMode(" + str(self.mode) + ")"
+        return f"pushMode({str(self.mode)})"
 
 
 # Implements the {@code popMode} lexer action by calling {@link Lexer#popMode}.
@@ -178,7 +178,7 @@ class LexerModeAction(LexerAction):
             return self.mode == other.mode
 
     def __str__(self):
-        return "mode(" + str(self.mode) + ")"
+        return f"mode({str(self.mode)})"
 
 # Executes a custom lexer action by calling {@link Recognizer#action} with the
 # rule and action indexes assigned to the custom action. The implementation of
@@ -250,7 +250,7 @@ class LexerChannelAction(LexerAction):
             return self.channel == other.channel
 
     def __str__(self):
-        return "channel(" + str(self.channel) + ")"
+        return f"channel({str(self.channel)})"
 
 # This implementation of {@link LexerAction} is used for tracking input offsets
 # for position-dependent actions within a {@link LexerActionExecutor}.

@@ -40,7 +40,7 @@ def main():
     before = datetime.now()
     sub()
     after = datetime.now()
-    print(str(after-before))
+    print(after-before)
     # before = after
     # sub()
     # after = datetime.now()

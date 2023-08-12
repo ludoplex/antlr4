@@ -20,8 +20,7 @@ class IntervalSet(object):
     def __iter__(self):
         if self.intervals is not None:
             for i in self.intervals:
-                for c in i:
-                    yield c
+                yield from i
 
     def __getitem__(self, item):
         i = 0
@@ -37,12 +36,9 @@ class IntervalSet(object):
 
     def addRange(self, v:range):
         if self.intervals is None:
-            self.intervals = list()
-            self.intervals.append(v)
+            self.intervals = []
         else:
-            # find insert pos
-            k = 0
-            for i in self.intervals:
+            for k, i in enumerate(self.intervals):
                 # distinct range -> insert
                 if v.stop<i.start:
                     self.intervals.insert(k, v)
@@ -56,9 +52,8 @@ class IntervalSet(object):
                     self.intervals[k] = range(min(i.start,v.start), max(i.stop,v.stop))
                     self.reduce(k)
                     return
-                k += 1
-            # greater than any existing
-            self.intervals.append(v)
+
+        self.intervals.append(v)
 
     def addSet(self, other:IntervalSet):
         if other.intervals is not None:
@@ -123,31 +118,30 @@ class IntervalSet(object):
                 k += 1
 
     def removeOne(self, v):
-        if self.intervals is not None:
-            k = 0
-            for i in self.intervals:
-                # intervals is ordered
-                if v<i.start:
-                    return
-                # check for single value range
-                elif v==i.start and v==i.stop-1:
-                    self.intervals.pop(k)
-                    return
-                # check for lower boundary
-                elif v==i.start:
-                    self.intervals[k] = range(i.start+1, i.stop)
-                    return
-                # check for upper boundary
-                elif v==i.stop-1:
-                    self.intervals[k] = range(i.start, i.stop-1)
-                    return
-                # split existing range
-                elif v<i.stop-1:
-                    x = range(i.start, v)
-                    self.intervals[k] = range(v + 1, i.stop)
-                    self.intervals.insert(k, x)
-                    return
-                k += 1
+        if self.intervals is None:
+            return
+        for k, i in enumerate(self.intervals):
+            # intervals is ordered
+            if v<i.start:
+                return
+            # check for single value range
+            elif v==i.start and v==i.stop-1:
+                self.intervals.pop(k)
+                return
+            # check for lower boundary
+            elif v==i.start:
+                self.intervals[k] = range(i.start+1, i.stop)
+                return
+            # check for upper boundary
+            elif v==i.stop-1:
+                self.intervals[k] = range(i.start, i.stop-1)
+                return
+            # split existing range
+            elif v<i.stop-1:
+                x = range(i.start, v)
+                self.intervals[k] = range(v + 1, i.stop)
+                self.intervals.insert(k, x)
+                return
 
 
     def toString(self, literalNames:list, symbolicNames:list):
@@ -175,6 +169,4 @@ class IntervalSet(object):
         else:
             if a<len(literalNames) and literalNames[a] != "<INVALID>":
                 return literalNames[a]
-            if a<len(symbolicNames):
-                return symbolicNames[a]
-            return "<UNKNOWN>"
+            return symbolicNames[a] if a<len(symbolicNames) else "<UNKNOWN>"

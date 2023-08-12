@@ -113,9 +113,9 @@ class ParseTreePatternMatcher(object):
     # @exception IllegalArgumentException if {@code stop} is {@code null} or empty.
     #
     def setDelimiters(self, start:str, stop:str, escapeLeft:str):
-        if start is None or len(start)==0:
+        if start is None or not start:
             raise Exception("start cannot be null or empty")
-        if stop is None or len(stop)==0:
+        if stop is None or not stop:
             raise Exception("stop cannot be null or empty")
         self.start = start
         self.stop = stop
@@ -130,7 +130,7 @@ class ParseTreePatternMatcher(object):
     #  compiled pattern instead of a string representation of a tree pattern.
     #
     def matchesPattern(self, tree:ParseTree, pattern:ParseTreePattern):
-        mismatchedNode = self.matchImpl(tree, pattern.patternTree, dict())
+        mismatchedNode = self.matchImpl(tree, pattern.patternTree, {})
         return mismatchedNode is None
 
     #
@@ -149,7 +149,7 @@ class ParseTreePatternMatcher(object):
     # string representation of a tree pattern.
     #
     def matchPattern(self, tree:ParseTree, pattern:ParseTreePattern):
-        labels = dict()
+        labels = {}
         mismatchedNode = self.matchImpl(tree, pattern.patternTree, labels)
         from antlr4.tree.ParseTreeMatch import ParseTreeMatch
         return ParseTreeMatch(tree, pattern, labels, mismatchedNode)
@@ -209,16 +209,12 @@ class ParseTreePatternMatcher(object):
                     self.map(labels, tokenTagToken.tokenName, tree)
                     if tokenTagToken.label is not None:
                         self.map(labels, tokenTagToken.label, tree)
-                elif tree.getText()==patternTree.getText():
-                    # x and x
-                    pass
-                else:
+                elif tree.getText() != patternTree.getText():
                     # x and y
                     if mismatchedNode is None:
                         mismatchedNode = tree
-            else:
-                if mismatchedNode is None:
-                    mismatchedNode = tree
+            elif mismatchedNode is None:
+                mismatchedNode = tree
 
             return mismatchedNode
 
@@ -233,9 +229,8 @@ class ParseTreePatternMatcher(object):
                     self.map(labels, ruleTagToken.ruleName, tree)
                     if ruleTagToken.label is not None:
                         self.map(labels, ruleTagToken.label, tree)
-                else:
-                    if mismatchedNode is None:
-                        mismatchedNode = tree
+                elif mismatchedNode is None:
+                    mismatchedNode = tree
 
                 return mismatchedNode
 
@@ -259,7 +254,7 @@ class ParseTreePatternMatcher(object):
     def map(self, labels, label, tree):
         v = labels.get(label, None)
         if v is None:
-            v = list()
+            v = []
             labels[label] = v
         v.append(tree)
 
@@ -277,23 +272,23 @@ class ParseTreePatternMatcher(object):
         chunks = self.split(pattern)
 
         # create token stream from text and tags
-        tokens = list()
+        tokens = []
         for chunk in chunks:
             if isinstance( chunk, TagChunk ):
                 # add special rule token or conjure up new token from name
                 if chunk.tag[0].isupper():
                     ttype = self.parser.getTokenType(chunk.tag)
                     if ttype==Token.INVALID_TYPE:
-                        raise Exception("Unknown token " + str(chunk.tag) + " in pattern: " + pattern)
+                        raise Exception(f"Unknown token {str(chunk.tag)} in pattern: {pattern}")
                     tokens.append(TokenTagToken(chunk.tag, ttype, chunk.label))
                 elif chunk.tag[0].islower():
                     ruleIndex = self.parser.getRuleIndex(chunk.tag)
                     if ruleIndex==-1:
-                        raise Exception("Unknown rule " + str(chunk.tag) + " in pattern: " + pattern)
+                        raise Exception(f"Unknown rule {str(chunk.tag)} in pattern: {pattern}")
                     ruleImaginaryTokenType = self.parser.getATNWithBypassAlts().ruleToTokenType[ruleIndex]
                     tokens.append(RuleTagToken(chunk.tag, ruleImaginaryTokenType, chunk.label))
                 else:
-                    raise Exception("invalid tag: " + str(chunk.tag) + " in pattern: " + pattern)
+                    raise Exception(f"invalid tag: {str(chunk.tag)} in pattern: {pattern}")
             else:
                 self.lexer.setInputStream(InputStream(chunk.text))
                 t = self.lexer.nextToken()
@@ -306,10 +301,10 @@ class ParseTreePatternMatcher(object):
     def split(self, pattern:str):
         p = 0
         n = len(pattern)
-        chunks = list()
+        chunks = []
         # find all start and stop indexes first, then collect
-        starts = list()
-        stops = list()
+        starts = []
+        stops = []
         while p < n :
             if p == pattern.find(self.escape + self.start, p):
                 p += len(self.escape) + len(self.start)
@@ -327,20 +322,20 @@ class ParseTreePatternMatcher(object):
         nt = len(starts)
 
         if nt > len(stops):
-            raise Exception("unterminated tag in pattern: " + pattern)
+            raise Exception(f"unterminated tag in pattern: {pattern}")
         if nt < len(stops):
-            raise Exception("missing start tag in pattern: " + pattern)
+            raise Exception(f"missing start tag in pattern: {pattern}")
 
         for i in range(0, nt):
             if starts[i] >= stops[i]:
-                raise Exception("tag delimiters out of order in pattern: " + pattern)
+                raise Exception(f"tag delimiters out of order in pattern: {pattern}")
 
         # collect into chunks now
         if nt==0:
             chunks.append(TextChunk(pattern))
 
         if nt>0 and starts[0]>0: # copy text up to first tag into chunks
-            text = pattern[0:starts[0]]
+            text = pattern[:starts[0]]
             chunks.add(TextChunk(text))
 
         for i in range(0, nt):
@@ -350,8 +345,8 @@ class ParseTreePatternMatcher(object):
             label = None
             colon = tag.find(':')
             if colon >= 0:
-                label = tag[0:colon]
-                ruleOrToken = tag[colon+1 : len(tag)]
+                label = tag[:colon]
+                ruleOrToken = tag[colon+1:]
             chunks.append(TagChunk(label, ruleOrToken))
             if i+1 < len(starts):
                 # copy from end of <tag> to start of next

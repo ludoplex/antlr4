@@ -76,6 +76,7 @@ class XPath(object):
         lexer = XPathLexer(input)
         def recover(self, e):
             raise e
+
         lexer.recover = recover
         lexer.removeErrorListeners()
         lexer.addErrorListener(ErrorListener()) # XPathErrorListener does no more
@@ -88,7 +89,7 @@ class XPath(object):
             raise Exception(msg, e)
 
         tokens = iter(tokenStream.tokens)
-        elements = list()
+        elements = []
         for el in tokens:
             invert = False
             anywhere = False
@@ -97,7 +98,7 @@ class XPath(object):
                 anywhere = el.type == XPathLexer.ANYWHERE
                 next_el = next(tokens, None)
                 if not next_el:
-                    raise Exception('Missing element after %s' % el.getText())
+                    raise Exception(f'Missing element after {el.getText()}')
                 else:
                     el = next_el
             # Check for bangs
@@ -105,7 +106,7 @@ class XPath(object):
                 invert = True
                 next_el = next(tokens, None)
                 if not next_el:
-                    raise Exception('Missing element after %s' % el.getText())
+                    raise Exception(f'Missing element after {el.getText()}')
                 else:
                     el = next_el
             # Add searched element
@@ -116,7 +117,7 @@ class XPath(object):
             elif el.type==Token.EOF:
                 break
             else:
-                raise Exception("Unknown path element %s" % lexer.symbolicNames[el.type])
+                raise Exception(f"Unknown path element {lexer.symbolicNames[el.type]}")
         return elements
 
     #
@@ -129,7 +130,7 @@ class XPath(object):
             raise Exception("Missing path element at end of path")
 
         word = wordToken.text
-        if wordToken.type==XPathLexer.WILDCARD :
+        if wordToken.type==XPathLexer.WILDCARD:
             return XPathWildcardAnywhereElement() if anywhere else XPathWildcardElement()
 
         elif wordToken.type in [XPathLexer.TOKEN_REF, XPathLexer.STRING]:
@@ -139,9 +140,8 @@ class XPath(object):
             if wordToken.type == XPathLexer.TOKEN_REF:
                 if word in tsource.ruleNames:
                     ttype = tsource.ruleNames.index(word) + 1
-            else:
-                if word in tsource.literalNames:
-                    ttype = tsource.literalNames.index(word)
+            elif word in tsource.literalNames:
+                ttype = tsource.literalNames.index(word)
 
             if ttype == Token.INVALID_TYPE:
                 raise Exception("%s at index %d isn't a valid token name" % (word, wordToken.tokenIndex))
@@ -171,7 +171,7 @@ class XPath(object):
 
         work = [dummyRoot]
         for element in self.elements:
-            work_next = list()
+            work_next = []
             for node in work:
                 if not isinstance(node, TerminalNode) and node.children:
                     # only try to match next element if it has children
@@ -196,7 +196,12 @@ class XPathElement(object):
         self.invert = False
 
     def __str__(self):
-        return type(self).__name__ + "[" + ("!" if self.invert else "") + self.nodeName + "]"
+        return (
+            f"{type(self).__name__}["
+            + ("!" if self.invert else "")
+            + self.nodeName
+            + "]"
+        )
 
 
 
@@ -250,10 +255,7 @@ class XPathWildcardAnywhereElement(XPathElement):
         super().__init__(XPath.WILDCARD)
 
     def evaluate(self, t:ParseTree):
-        if self.invert:
-            return list() # !* is weird but valid (empty)
-        else:
-            return Trees.descendants(t)
+        return [] if self.invert else Trees.descendants(t)
 
 
 class XPathWildcardElement(XPathElement):
@@ -263,7 +265,4 @@ class XPathWildcardElement(XPathElement):
 
 
     def evaluate(self, t:ParseTree):
-        if self.invert:
-            return list() # !* is weird but valid (empty)
-        else:
-            return Trees.getChildren(t)
+        return [] if self.invert else Trees.getChildren(t)

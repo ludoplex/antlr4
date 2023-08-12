@@ -43,5 +43,5 @@ class ATNSimulator(object):
     def getCachedContext(self, context:PredictionContext):
         if self.sharedContextCache is None:
             return context
-        visited = dict()
+        visited = {}
         return getCachedPredictionContext(context, self.sharedContextCache, visited)

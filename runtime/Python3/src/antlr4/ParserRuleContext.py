@@ -114,14 +114,13 @@ class ParserRuleContext(RuleContext):
     def getChild(self, i:int, ttype:type = None):
         if ttype is None:
             return self.children[i] if len(self.children)>i else None
-        else:
-            for child in self.getChildren():
-                if not isinstance(child, ttype):
-                    continue
-                if i==0:
-                    return child
-                i -= 1
-            return None
+        for child in self.getChildren():
+            if not isinstance(child, ttype):
+                continue
+            if i==0:
+                return child
+            i -= 1
+        return None
 
     def getChildren(self, predicate = None):
         if self.children is not None:
@@ -160,12 +159,7 @@ class ParserRuleContext(RuleContext):
         children = self.getChildren()
         if children is None:
             return []
-        contexts = []
-        for child in children:
-            if not isinstance(child, ctxType):
-                continue
-            contexts.append(child)
-        return contexts
+        return [child for child in children if isinstance(child, ctxType)]
 
     def getChildCount(self):
         return len(self.children) if self.children else 0

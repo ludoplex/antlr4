@@ -69,10 +69,7 @@ def andContext(a:SemanticContext, b:SemanticContext):
     if b is None or b is SemanticContext.NONE:
         return a
     result = AND(a, b)
-    if len(result.opnds) == 1:
-        return result.opnds[0]
-    else:
-        return result
+    return result.opnds[0] if len(result.opnds) == 1 else result
 
 # need forward declaration
 OR = None
@@ -85,10 +82,7 @@ def orContext(a:SemanticContext, b:SemanticContext):
     if a is SemanticContext.NONE or b is SemanticContext.NONE:
         return SemanticContext.NONE
     result = OR(a, b)
-    if len(result.opnds) == 1:
-        return result.opnds[0]
-    else:
-        return result
+    return result.opnds[0] if len(result.opnds) == 1 else result
 
 def filterPrecedencePredicates(collection:set):
     return [context for context in collection if isinstance(context, PrecedencePredicate)]
@@ -222,7 +216,7 @@ class AND(SemanticContext):
         if not differs:
             return self
 
-        if len(operands)==0:
+        if not operands:
             # all elements were true, so the AND context is true
             return SemanticContext.NONE
 
@@ -306,7 +300,7 @@ class OR (SemanticContext):
         if not differs:
             return self
 
-        if len(operands)==0:
+        if not operands:
             # all elements were false, so the OR context is false
             return None
 

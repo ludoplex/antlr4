@@ -29,7 +29,7 @@ def freshen(ROOT):
 def get_change_list(fname):
     files = {}
     with open(fname, "r") as f:
-        for line in f.readlines():
+        for line in f:
             line = line.strip()
             if len(line)>0 and not line.startswith("#"):
                 if line.startswith('*'): # '*' implies change multiple lines
